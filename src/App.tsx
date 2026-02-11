@@ -14,16 +14,28 @@ function App() {
   }
 
   useEffect(() => {
+    let unsubscribe: (() => void) | null = null;
+
     const setupListener = async () => {
-      const unsubscribe = await listen("key-pressed", (event: any) => {
+      unsubscribe = await listen("key-pressed", (event: any) => {
         setLastKey(event.payload.key);
         console.log("Key pressed:", event.payload.key);
       });
+    };
 
-      return () => unsubscribe();
+    const handleKeyDown = (event: KeyboardEvent) => {
+      setLastKey(event.key);
     };
 
     setupListener();
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
   }, []);
 
   return (
