@@ -1,16 +1,30 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/core";
+import { listen } from "@tauri-apps/api/event";
 import "./App.css";
 
 function App() {
   const [greetMsg, setGreetMsg] = useState("");
   const [name, setName] = useState("");
+  const [lastKey, setLastKey] = useState("");
 
   async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
     setGreetMsg(await invoke("greet", { name }));
   }
+
+  useEffect(() => {
+    const setupListener = async () => {
+      const unsubscribe = await listen("key-pressed", (event: any) => {
+        setLastKey(event.payload.key);
+        console.log("Key pressed:", event.payload.key);
+      });
+
+      return () => unsubscribe();
+    };
+
+    setupListener();
+  }, []);
 
   return (
     <main className="container">
@@ -44,6 +58,7 @@ function App() {
         <button type="submit">Greet</button>
       </form>
       <p>{greetMsg}</p>
+      <p>Last key pressed: {lastKey}</p>
     </main>
   );
 }
