@@ -8,16 +8,10 @@ struct KeyEvent {
     key: String,
 }
 
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
-}
-
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![greet])
         // Set up the key listener in a separate thread
         .setup(|app| {
             let app_handle = app.handle().clone(); // Clone the app handle for use in the thread
