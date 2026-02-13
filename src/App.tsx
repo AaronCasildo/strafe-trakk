@@ -1,18 +1,27 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect} from "react";
 import { listen } from "@tauri-apps/api/event";
 import "./App.css";
 
 function App() {
   const [lastKey, setLastKey] = useState("");
+  const [keyHistory, setKeyHistory] = useState("");
   
   useEffect(() => {
     let unsubscribe: (() => void) | null = null;
 
     const setupListener = async () => {
       unsubscribe = await listen("key-pressed", (event: any) => {
-        setLastKey(event.payload.key);
-        console.log("Key pressed:", event.payload.key);
+        const eventKey = event.payload.key;
+
+        setLastKey(eventKey);
+        setKeyHistory((prev) => prev+ eventKey);
       });
+      
+      return () => {        
+        if (unsubscribe) {
+          unsubscribe();
+        }
+      };
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -34,6 +43,7 @@ function App() {
     <main className="container">
       <h1>Strafe Trakk</h1>
       <p>Last key pressed: {lastKey}</p>
+      <p>History of keys pressed: {keyHistory}</p>
     </main>
   );
 }
