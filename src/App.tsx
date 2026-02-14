@@ -17,16 +17,9 @@ function App() {
       });
     };
 
-    const handleKeyDown = (event: KeyboardEvent) => {
-      setLastKey(event.key);
-      setKeyHistory((prev) => prev + event.key);
-    };
-
     setupListener();
-    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
       if (unsubscribe) {
         unsubscribe();
       }
