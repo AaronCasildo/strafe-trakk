@@ -19,6 +19,7 @@ pub fn run() {
             // Spawn a new thread to listen for key events
             thread::spawn(move || { 
                 rdev::listen(move |event| {
+                    // Only handle KeyPress events and filter out duplicates
                     if let rdev::EventType::KeyPress(key) = event.event_type {
                         let key_str = format!("{:?}", key);
                         // Emit to all windows
