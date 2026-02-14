@@ -37,7 +37,7 @@ function App() {
     <main className="container">
       <h1>Strafe Trakk</h1>
       <p>Last key pressed: {lastKey}</p>
-      <p>History of keys pressed: {keyHistory}</p>
+      <p>History of keys pressed: {keyHistory.slice(-10)}</p>
     </main>
   );
 }
