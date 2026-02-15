@@ -1,6 +1,6 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 use std::thread;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 use std::collections::HashSet;
 use tauri::{Emitter, Manager};
 use serde::Serialize;
@@ -9,6 +9,7 @@ use device_query::{DeviceQuery, DeviceState, Keycode};
 #[derive(Serialize, Clone)]
 struct KeyEvent {
     key: String,
+    time_since_last_ms: Option<u128>,
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -23,6 +24,7 @@ pub fn run() {
             thread::spawn(move || {
                 let device_state = DeviceState::new();
                 let mut previous_keys: HashSet<Keycode> = HashSet::new();
+                let mut last_key_time: Option<Instant> = None;
                 
                 loop {
                     let keys = device_state.get_keys();
@@ -33,10 +35,22 @@ pub fn run() {
                     
                     for key in newly_pressed {
                         let key_str = format!("{:?}", key);
+                        let current_time = Instant::now();
+                        
+                        // Calculate time since last key press
+                        let time_since_last_ms = last_key_time.map(|last| {
+                            current_time.duration_since(last).as_millis()
+                        });
+                        
                         // Emit to all windows
                         for (_label, window) in app_handle.webview_windows() {
-                            let _ = window.emit("key-pressed", KeyEvent { key: key_str.clone() });
+                            let _ = window.emit("key-pressed", KeyEvent { 
+                                key: key_str.clone(),
+                                time_since_last_ms,
+                            });
                         }
+                        
+                        last_key_time = Some(current_time);
                     }
                     
                     previous_keys = current_keys;
