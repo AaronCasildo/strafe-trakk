@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { listen } from "@tauri-apps/api/event";
+import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 import "./App.css";
 
 function App() {
@@ -7,6 +8,25 @@ function App() {
   const [keyHistory, setKeyHistory] = useState("");
   const [timeSinceLast, setTimeSinceLast] = useState<number | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  
+  const openSettingsWindow = async () => {
+    const settingsWindow = new WebviewWindow('settings', {
+      url: '/settings',
+      title: 'Settings',
+      width: 600,
+      height: 400,
+      resizable: true,
+      center: true,
+    });
+
+    settingsWindow.once('tauri://created', function () {
+      console.log('Settings window created');
+    });
+
+    settingsWindow.once('tauri://error', function (e) {
+      console.error('Error creating settings window:', e);
+    });
+  };
   
   useEffect(() => {
     let unsubscribe: (() => void) | null = null;
@@ -41,10 +61,9 @@ function App() {
         </button>
         {isMenuOpen && (
           <div className="dropdown-content">
-            <div className="dropdown-item">Option 1</div>
-            <div className="dropdown-item">Option 2</div>
-            <div className="dropdown-item">Option 3</div>
-            <div className="dropdown-item">Settings</div>
+            <div className="dropdown-item">Sign In</div>
+            <div className="dropdown-item">Log In</div>
+            <div className="dropdown-item" onClick={openSettingsWindow}>Settings</div>
           </div>
         )}
       </div>
