@@ -14,10 +14,13 @@ function App() {
     const setupListener = async () => {
       unsubscribe = await listen("key-pressed", (event: any) => {
         const eventKey = event.payload.key;
-        const timeMs = event.payload.time_since_last_ms;
+        const timeMs = event.payload.time_since_release_ms;
         setLastKey(eventKey);
         setKeyHistory((prev) => prev + eventKey);
+
+        if (event.payload.time_since_release_ms < 300) {
         setTimeSinceLast(timeMs);
+        }
       });
     };
 
@@ -50,7 +53,7 @@ function App() {
         <h1>Strafe Trakk</h1>
 
         <p>Last key pressed: {lastKey}</p>
-        <p>Time since last key: {timeSinceLast !== null ? `${timeSinceLast} ms` : 'N/A'}</p>
+        <p>Time since key release: {timeSinceLast !== null ? `${timeSinceLast} ms` : 'N/A'}</p>
         <p>History of keys pressed: {keyHistory.slice(-10)}</p>
       </main>
     </>
