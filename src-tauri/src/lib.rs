@@ -9,7 +9,7 @@ use device_query::{DeviceQuery, DeviceState, Keycode};
 #[derive(Serialize, Clone)]
 struct KeyEvent {
     key: String,
-    time_since_last_ms: Option<u128>,
+    time_since_release_ms: Option<u128>,
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -24,11 +24,19 @@ pub fn run() {
             thread::spawn(move || {
                 let device_state = DeviceState::new();
                 let mut previous_keys: HashSet<Keycode> = HashSet::new();
-                let mut last_key_time: Option<Instant> = None;
+                let mut last_key_release_time: Option<Instant> = None;
                 
                 loop {
                     let keys = device_state.get_keys();
                     let current_keys: HashSet<Keycode> = keys.into_iter().collect();
+                    
+                    // Detect newly released keys (keys in previous but not in current)
+                    let newly_released: Vec<&Keycode> = previous_keys.difference(&current_keys).collect();
+                    
+                    for _key in newly_released {
+                        // Update the time when a key was released
+                        last_key_release_time = Some(Instant::now());
+                    }
                     
                     // Detect newly pressed keys (keys in current but not in previous)
                     let newly_pressed: Vec<&Keycode> = current_keys.difference(&previous_keys).collect();
@@ -37,26 +45,24 @@ pub fn run() {
                         let key_str = format!("{:?}", key);
                         let current_time = Instant::now();
                         
-                        // Calculate time since last key press
-                        let time_since_last_ms = last_key_time.map(|last| {
-                            current_time.duration_since(last).as_millis()
+                        // Calculate time since last key release
+                        let time_since_release_ms = last_key_release_time.map(|last_release| {
+                            current_time.duration_since(last_release).as_millis()
                         });
                         
                         // Emit to all windows
                         for (_label, window) in app_handle.webview_windows() {
                             let _ = window.emit("key-pressed", KeyEvent { 
                                 key: key_str.clone(),
-                                time_since_last_ms,
+                                time_since_release_ms,
                             });
                         }
-                        
-                        last_key_time = Some(current_time);
                     }
                     
                     previous_keys = current_keys;
                     
                     // Small delay to avoid excessive CPU usage
-                    thread::sleep(Duration::from_millis(10));
+                    thread::sleep(Duration::from_millis(1));
                 }
             });
             Ok(())
