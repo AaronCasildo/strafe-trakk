@@ -36,10 +36,14 @@ function App() {
         const eventKey = event.payload.key;
         const timeMs = event.payload.time_since_release_ms;
         setLastKey(eventKey);
-        setKeyHistory((prev) => prev + eventKey);
-
-        if (event.payload.time_since_release_ms < 300) {
-        setTimeSinceLast(timeMs);
+        
+        // Update timing if it's a valid value
+        if (timeMs != null) {
+          setKeyHistory((prev) => prev + eventKey);
+          // Check absolute value against threshold
+          if (Math.abs(timeMs) < 300) {
+            setTimeSinceLast(timeMs);
+          }
         }
       });
     };
@@ -71,9 +75,13 @@ function App() {
       <main className="container">
         <h1>Strafe Trakk</h1>
 
-        <p>Last key pressed: {lastKey}</p>
-        <p>Time since key release: {timeSinceLast !== null ? `${timeSinceLast} ms` : 'N/A'}</p>
-        <p>History of keys pressed: {keyHistory.slice(-10)}</p>
+        <p>Last key: {lastKey}</p>
+        <p>
+          Counter-strafe timing: {timeSinceLast !== null 
+            ? `${timeSinceLast} ms ${timeSinceLast < 0 ? '(early overlap)' : '(clean)'}`
+            : 'N/A'}
+        </p>
+        <p>History: {keyHistory.slice(-10)}</p>
       </main>
     </>
   );
