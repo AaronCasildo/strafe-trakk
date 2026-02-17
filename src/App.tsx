@@ -12,7 +12,9 @@ function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const threshold = Number(localStorage.getItem("strafeThresholdMs")) || DEFAULT_THRESHOLD;
-  
+  const leftKey = localStorage.getItem("strafeLeftKey") || "A";
+  const rightKey = localStorage.getItem("strafeRightKey") || "D";
+
   const openSettingsWindow = async () => {
     const settingsWindow = new WebviewWindow('settings', {
       url: '/settings',
@@ -39,6 +41,10 @@ function App() {
       unsubscribe = await listen("key-pressed", (event: any) => {
         const eventKey = event.payload.key;
         const timeMs = event.payload.time_since_release_ms;
+
+        // Only track the configured strafe keys
+        if (eventKey !== leftKey && eventKey !== rightKey) return;
+
         setLastKey(eventKey);
         
         // Update timing if it's a valid value
