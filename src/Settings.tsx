@@ -1,16 +1,61 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { listen } from "@tauri-apps/api/event";
 import "./App.css";
 
 const DEFAULT_THRESHOLD = 300;
+
+type BindingTarget = "left" | "right" | null;
 
 function Settings() {
   const [threshold, setThreshold] = useState<number>(() => {
     const saved = localStorage.getItem("strafeThresholdMs");
     return saved ? Number(saved) : DEFAULT_THRESHOLD;
   });
+  const [leftKey, setLeftKey] = useState<string>(() => {
+    return localStorage.getItem("strafeLeftKey") || "A";
+  });
+  const [rightKey, setRightKey] = useState<string>(() => {
+    return localStorage.getItem("strafeRightKey") || "D";
+  });
+  const [listening, setListening] = useState<BindingTarget>(null);
+  const listeningRef = useRef<BindingTarget>(null);
+
+  // Keep ref in sync so the Tauri listener always sees the latest value
+  useEffect(() => {
+    listeningRef.current = listening;
+  }, [listening]);
+
+  // Listen for key-pressed events from the Rust backend for key binding
+  useEffect(() => {
+    let unsubscribe: (() => void) | null = null;
+
+    const setup = async () => {
+      unsubscribe = await listen("any-key-pressed", (event: any) => {
+        const target = listeningRef.current;
+        if (!target) return;
+
+        const key: string = event.payload;
+        if (target === "left") {
+          setLeftKey(key);
+        } else {
+          setRightKey(key);
+        }
+        setListening(null);
+      });
+    };
+
+    setup();
+    return () => { if (unsubscribe) unsubscribe(); };
+  }, []);
 
   const handleSave = () => {
+    if (leftKey === rightKey) {
+      alert("Left and right keys must be different!");
+      return;
+    }
     localStorage.setItem("strafeThresholdMs", String(threshold));
+    localStorage.setItem("strafeLeftKey", leftKey);
+    localStorage.setItem("strafeRightKey", rightKey);
     alert("Saved! Restart or refresh the main window to apply.");
   };
 
@@ -32,6 +77,36 @@ function Settings() {
         <p style={{ fontSize: "0.85em", opacity: 0.7 }}>
           Events with an absolute timing above this value are ignored.
         </p>
+      </div>
+
+      <div style={{ marginTop: "20px" }}>
+        <h3>Strafe Keys</h3>
+        <div style={{ display: "flex", gap: "20px", alignItems: "center", marginTop: "10px" }}>
+          <div>
+            <span>Left: </span>
+            <button
+              onClick={() => setListening(listening === "left" ? null : "left")}
+              style={{ minWidth: "80px" }}
+            >
+              {listening === "left" ? "Press a key…" : leftKey}
+            </button>
+          </div>
+          <div>
+            <span>Right: </span>
+            <button
+              onClick={() => setListening(listening === "right" ? null : "right")}
+              style={{ minWidth: "80px" }}
+            >
+              {listening === "right" ? "Press a key…" : rightKey}
+            </button>
+          </div>
+        </div>
+        <p style={{ fontSize: "0.85em", opacity: 0.7 }}>
+          Click a button then press the key you use to strafe in that direction.
+        </p>
+      </div>
+
+      <div style={{ marginTop: "20px" }}>
         <button onClick={handleSave}>Save</button>
       </div>
 
