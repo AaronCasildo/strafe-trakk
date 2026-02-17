@@ -3,11 +3,15 @@ import { listen } from "@tauri-apps/api/event";
 import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 import "./App.css";
 
+const DEFAULT_THRESHOLD = 300;
+
 function App() {
   const [lastKey, setLastKey] = useState("");
   const [keyHistory, setKeyHistory] = useState("");
   const [timeSinceLast, setTimeSinceLast] = useState<number | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const threshold = Number(localStorage.getItem("strafeThresholdMs")) || DEFAULT_THRESHOLD;
   
   const openSettingsWindow = async () => {
     const settingsWindow = new WebviewWindow('settings', {
@@ -41,7 +45,7 @@ function App() {
         if (timeMs != null) {
           setKeyHistory((prev) => prev + eventKey);
           // Check absolute value against threshold
-          if (Math.abs(timeMs) < 300) {
+          if (Math.abs(timeMs) < threshold) {
             setTimeSinceLast(timeMs);
           }
         }
