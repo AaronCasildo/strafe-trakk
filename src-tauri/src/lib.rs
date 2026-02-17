@@ -60,6 +60,9 @@ impl KeyTracker {
         let key_str = format!("{:?}", key);
         self.key_press_times.insert(*key, current_time);
 
+        // Emit for every key press (used by settings key binding)
+        emit_any_key(app_handle, key_str.clone());
+
         let was_key_held = !self.previous_keys.is_empty();
 
         if !was_key_held {
@@ -105,6 +108,13 @@ fn emit_key_event(app_handle: &AppHandle, key: String, timing: Option<i128>) {
             key: key.clone(),
             time_since_release_ms: timing,
         });
+    }
+}
+
+/// Emit a simple key-name event for every new key press (used for key binding)
+fn emit_any_key(app_handle: &AppHandle, key: String) {
+    for (_label, window) in app_handle.webview_windows() {
+        let _ = window.emit("any-key-pressed", key.clone());
     }
 }
 
