@@ -86,6 +86,7 @@ function App() {
             : 'N/A'}
         </p>
         <p>History: {keyHistory.slice(-10)}</p>
+        <p>Threshold: {threshold} ms</p>
       </main>
     </>
   );
