@@ -17,6 +17,7 @@ struct KeyTracker {
     previous_keys: HashSet<Keycode>,
     key_press_times: HashMap<Keycode, Instant>,
     last_key_release_time: Option<Instant>,
+    last_released_key: Option<Keycode>,
 }
 
 impl KeyTracker {
@@ -25,6 +26,7 @@ impl KeyTracker {
             previous_keys: HashSet::new(),
             key_press_times: HashMap::new(),
             last_key_release_time: None,
+            last_released_key: None,
         }
     }
 
@@ -66,9 +68,13 @@ impl KeyTracker {
         let was_key_held = !self.previous_keys.is_empty();
 
         if !was_key_held {
-            // Clean strafe scenario
-            if let Some(timing) = self.calculate_clean_strafe_timing(current_time) {
-                emit_key_event(app_handle, key_str, Some(timing));
+            // Clean strafe scenario – only count if the key differs from the last released key
+            let is_direction_change = self.last_released_key
+                .map_or(false, |last| last != *key);
+            if is_direction_change {
+                if let Some(timing) = self.calculate_clean_strafe_timing(current_time) {
+                    emit_key_event(app_handle, key_str, Some(timing));
+                }
             }
         }
         // Counter-strafe timing will be calculated on key release
@@ -83,6 +89,7 @@ impl KeyTracker {
         app_handle: &AppHandle,
     ) {
         self.last_key_release_time = Some(current_time);
+        self.last_released_key = Some(*released_key);
 
         if !held_keys.is_empty() {
             // Counter-strafe scenario
