@@ -34,6 +34,18 @@ function App() {
     });
   };
   
+  // Reload when settings are saved
+  useEffect(() => {
+    let unsub: (() => void) | null = null;
+    const setup = async () => {
+      unsub = await listen("settings-changed", () => {
+        window.location.reload();
+      });
+    };
+    setup();
+    return () => { if (unsub) unsub(); };
+  }, []);
+
   useEffect(() => {
     let unsubscribe: (() => void) | null = null;
 
