@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { listen } from "@tauri-apps/api/event";
+import { listen, emit } from "@tauri-apps/api/event";
+import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import "./App.css";
 
 const DEFAULT_THRESHOLD = 300;
@@ -48,7 +49,7 @@ function Settings() {
     return () => { if (unsubscribe) unsubscribe(); };
   }, []);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (leftKey === rightKey) {
       alert("Left and right keys must be different!");
       return;
@@ -56,7 +57,8 @@ function Settings() {
     localStorage.setItem("strafeThresholdMs", String(threshold));
     localStorage.setItem("strafeLeftKey", leftKey);
     localStorage.setItem("strafeRightKey", rightKey);
-    alert("Saved! Restart or refresh the main window to apply.");
+    await emit("settings-changed");
+    getCurrentWebviewWindow().close();
   };
 
   return (
@@ -107,7 +109,7 @@ function Settings() {
       </div>
 
       <div style={{ marginTop: "20px" }}>
-        <button onClick={handleSave}>Save</button>
+        <button onClick={handleSave}>Save & Reload</button>
       </div>
 
       <div style={{ marginTop: "30px" }}>
