@@ -9,6 +9,7 @@ use device_query::{DeviceQuery, DeviceState, Keycode};
 #[derive(Serialize, Clone)]
 struct KeyEvent {
     key: String,
+    pair_key: Option<String>,
     time_since_release_ms: Option<i128>,
 }
 
@@ -73,7 +74,8 @@ impl KeyTracker {
                 .map_or(false, |last| last != *key);
             if is_direction_change {
                 if let Some(timing) = self.calculate_clean_strafe_timing(current_time) {
-                    emit_key_event(app_handle, key_str, Some(timing));
+                    let pair = self.last_released_key.map(|k| format!("{:?}", k));
+                    emit_key_event(app_handle, key_str, pair, Some(timing));
                 }
             }
         }
@@ -93,9 +95,15 @@ impl KeyTracker {
 
         if !held_keys.is_empty() {
             // Counter-strafe scenario
+            // Find the most recently pressed held key (used for timing)
+            let pair = held_keys
+                .iter()
+                .filter_map(|k| self.key_press_times.get(k).map(|t| (k, t)))
+                .max_by_key(|&(_, t)| *t)
+                .map(|(k, _)| format!("{:?}", k));
             if let Some(timing) = self.calculate_counter_strafe_timing(current_time, held_keys) {
                 let key_str = format!("{:?}", released_key);
-                emit_key_event(app_handle, key_str, Some(timing));
+                emit_key_event(app_handle, key_str, pair, Some(timing));
             }
         }
 
@@ -109,10 +117,11 @@ impl KeyTracker {
 }
 
 /// Emit a key event to all windows
-fn emit_key_event(app_handle: &AppHandle, key: String, timing: Option<i128>) {
+fn emit_key_event(app_handle: &AppHandle, key: String, pair_key: Option<String>, timing: Option<i128>) {
     for (_label, window) in app_handle.webview_windows() {
         let _ = window.emit("key-pressed", KeyEvent {
             key: key.clone(),
+            pair_key: pair_key.clone(),
             time_since_release_ms: timing,
         });
     }
