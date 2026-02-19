@@ -77,13 +77,13 @@ function Settings() {
           />
         </label>
         <p style={{ fontSize: "0.85em", opacity: 0.7 }}>
-          Events with an absolute timing above this value are ignored.
+          Strafes with an absolute timing above this value are ignored.
         </p>
       </div>
 
-      <div style={{ marginTop: "20px" }}>
+      <div style={{ marginTop: "0px" , textAlign: "center"}}>
         <h3>Strafe Keys</h3>
-        <div style={{ display: "flex", gap: "20px", alignItems: "center", marginTop: "10px" }}>
+        <div style={{ display: "flex", gap: "20px", alignItems: "center", marginTop: "10px", justifyContent: "center" }}>
           <div>
             <span>Left: </span>
             <button
