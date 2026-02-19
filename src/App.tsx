@@ -7,7 +7,6 @@ const DEFAULT_THRESHOLD = 300;
 
 function App() {
   const [lastKey, setLastKey] = useState("");
-  const [keyHistory, setKeyHistory] = useState("");
   const [timeSinceLast, setTimeSinceLast] = useState<number | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -61,7 +60,6 @@ function App() {
         
         // Update timing if it's a valid value
         if (timeMs != null) {
-          setKeyHistory((prev) => prev + eventKey);
           // Check absolute value against threshold
           if (Math.abs(timeMs) < threshold) {
             setTimeSinceLast(timeMs);
@@ -104,7 +102,6 @@ function App() {
             ? `${timeSinceLast} ms ${timeSinceLast < 0 ? '(early overlap)' : '(clean)'}`
             : 'N/A'}
         </p>
-        <p>History: {keyHistory.slice(-10)}</p>
         <p>Threshold: {threshold} ms</p>
       </main>
     </>
