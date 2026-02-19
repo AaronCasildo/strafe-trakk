@@ -51,10 +51,14 @@ function App() {
     const setupListener = async () => {
       unsubscribe = await listen("key-pressed", (event: any) => {
         const eventKey = event.payload.key;
+        const pairKey = event.payload.pair_key;
         const timeMs = event.payload.time_since_release_ms;
 
         // Only track the configured strafe keys
         if (eventKey !== leftKey && eventKey !== rightKey) return;
+
+        // The paired key (the other key involved) must also be a strafe key
+        if (pairKey != null && pairKey !== leftKey && pairKey !== rightKey) return;
 
         setLastKey(eventKey);
         
