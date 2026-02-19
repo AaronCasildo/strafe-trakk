@@ -87,8 +87,9 @@ function App() {
         </button>
         {isMenuOpen && (
           <div className="dropdown-content">
-            <div className="dropdown-item">Sign In</div>
-            <div className="dropdown-item">Log In</div>
+            {/* <div className="dropdown-item">Sign In</div>
+            <div className="dropdown-item">Log In</div> */}
+            {/* Reserved for future implementation */}
             <div className="dropdown-item" onClick={openSettingsWindow}>Settings</div>
           </div>
         )}
