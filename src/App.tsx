@@ -20,8 +20,8 @@ function App() {
       url: '/settings',
       title: 'Settings',
       width: 600,
-      height: 400,
-      resizable: true,
+      height: 670,
+      resizable: false,
       center: true,
     });
 
