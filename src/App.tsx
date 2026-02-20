@@ -1,13 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { listen } from "@tauri-apps/api/event";
 import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
+import StrafeHistogram from "./StrafeHistogram";
 import "./App.css";
 
 const DEFAULT_THRESHOLD = 300;
 
 function App() {
   const [timeSinceLast, setTimeSinceLast] = useState<number | null>(null);
+  const [timings, setTimings] = useState<number[]>([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const clearTimings = useCallback(() => setTimings([]), []);
 
   const threshold = Number(localStorage.getItem("strafeThresholdMs")) || DEFAULT_THRESHOLD;
   const leftKey = localStorage.getItem("strafeLeftKey") || "A";
@@ -64,6 +68,7 @@ function App() {
           // Check absolute value against threshold
           if (Math.abs(timeMs) < threshold) {
             setTimeSinceLast(timeMs);
+            setTimings(prev => [...prev, timeMs]);
           }
         }
       });
@@ -102,6 +107,15 @@ function App() {
             : 'N/A'}
         </p>
         <p>Threshold: {threshold} ms</p>
+
+        <div className="chart-section">
+          <div className="chart-header">
+            <h2>Strafe Distribution</h2>
+            <button className="clear-btn" onClick={clearTimings}>Clear</button>
+          </div>
+          <StrafeHistogram timings={timings} binSize={10} range={threshold} />
+          <p className="timing-count">{timings.length} strafes recorded</p>
+        </div>
       </main>
     </>
   );
