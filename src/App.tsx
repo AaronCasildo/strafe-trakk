@@ -6,7 +6,6 @@ import "./App.css";
 const DEFAULT_THRESHOLD = 300;
 
 function App() {
-  const [lastKey, setLastKey] = useState("");
   const [timeSinceLast, setTimeSinceLast] = useState<number | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -59,8 +58,6 @@ function App() {
 
         // The paired key (the other key involved) must also be a strafe key
         if (pairKey != null && pairKey !== leftKey && pairKey !== rightKey) return;
-
-        setLastKey(eventKey);
         
         // Update timing if it's a valid value
         if (timeMs != null) {
@@ -99,8 +96,6 @@ function App() {
 
       <main className="container">
         <h1>Strafe Trakk</h1>
-
-        <p>Last key: {lastKey}</p>
         <p>
           Counter-strafe timing: {timeSinceLast !== null 
             ? `${timeSinceLast} ms ${timeSinceLast < 0 ? '(early overlap)' : '(clean)'}`
