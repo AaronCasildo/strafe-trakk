@@ -81,7 +81,7 @@ export default function StrafeHistogram({
             labelStyle={{ color: "#fff" }}
             itemStyle={{ color: "#fff" }}
           />
-          <ReferenceLine x={0} stroke="#c9b458" strokeWidth={2} />
+          <ReferenceLine x={0} stroke="#c9b458" strokeWidth={2} strokeDasharray="3 3" />
           <Bar dataKey="count">
             {bins.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={getBarColor(entry.center)} />
