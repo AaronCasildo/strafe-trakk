@@ -8,6 +8,7 @@ import {
   Tooltip,
   ResponsiveContainer,
   ReferenceLine,
+  Cell,
 } from "recharts";
 
 interface StrafeHistogramProps {
@@ -49,6 +50,12 @@ export default function StrafeHistogram({
       .map(([center, count]) => ({ center, count }));
   }, [timings, binSize, range]);
 
+  const getBarColor = (center: number) => {
+    if (center === 0) return "#c9b458"; // Golden/yellow for perfect
+    if (center < 0) return "#e74c3c"; // Red for early
+    return "#7ea889"; // Green for late
+  };
+
   if (timings.length === 0) {
     return (
       <div className="histogram-empty">
@@ -70,10 +77,16 @@ export default function StrafeHistogram({
             label={{ value: "Count", angle: -90, position: "insideLeft" }}
           />
           <Tooltip 
-            contentStyle={{ background: "#1a1a1a", border: "1px solid #444" }}
+            contentStyle={{ background: "#1a1a1a", border: "1px solid #444", color: "#fff" }}
+            labelStyle={{ color: "#fff" }}
+            itemStyle={{ color: "#fff" }}
           />
           <ReferenceLine x={0} stroke="#c9b458" strokeWidth={2} />
-          <Bar dataKey="count" fill="#7ea889" />
+          <Bar dataKey="count">
+            {bins.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={getBarColor(entry.center)} />
+            ))}
+          </Bar>
         </BarChart>
       </ResponsiveContainer>
       <div className="histogram-labels">
