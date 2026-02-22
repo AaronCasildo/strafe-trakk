@@ -149,6 +149,29 @@ button {
   margin-right: 5px;
 }
 
+.histogram-wrapper {
+  width: 100%;
+}
+
+.histogram-labels {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 40px;
+  margin-top: -10px;
+  font-size: 0.9em;
+  color: #888;
+  font-weight: 500;
+}
+
+.histogram-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 280px;
+  color: #888;
+  font-style: italic;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     color: #f6f6f6;
