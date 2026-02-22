@@ -66,16 +66,22 @@ function Settings() {
       <h1>Settings</h1>
 
       <div style={{ marginTop: "30px" }}>
-        <label>
-          Timing threshold (ms):{" "}
-          <input
-            type="number"
-            min={1}
-            value={threshold}
-            onChange={(e) => setThreshold(Number(e.target.value))}
-            style={{ width: "80px" }}
-          />
+        <label style={{ display: "block", marginBottom: "8px" }}>
+          Timing threshold: <strong>{threshold} ms</strong>
         </label>
+        <input
+          type="range"
+          min={50}
+          max={500}
+          step={10}
+          value={threshold}
+          onChange={(e) => setThreshold(Number(e.target.value))}
+          style={{ width: "90%" }}
+        />
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.8em", opacity: 0.6 }}>
+          <span>50 ms</span>
+          <span>500 ms</span>
+        </div>
         <p style={{ fontSize: "0.85em", opacity: 0.7 }}>
           Strafes with an absolute timing above this value are ignored.
         </p>
