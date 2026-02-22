@@ -81,12 +81,12 @@ export default function StrafeHistogram({
 
   return (
     <div className="histogram-wrapper">
-      <ResponsiveContainer width="100%" height={280}>
-        <BarChart data={bins} margin={{ top: 20, right: 20, left: 0, bottom: 5 }}>
+      <ResponsiveContainer width="100%" height={300}>
+        <BarChart data={bins} margin={{ top: 20, right: 20, left: 0, bottom: 20 }}>
           <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
           <XAxis 
             dataKey="center" 
-            label={{ value: "Timing (ms)", position: "insideBottom", offset: -5 }}
+            label={{ value: "Timing (ms)", position: "insideBottom", offset: -15 }}
           />
           <YAxis 
             label={{ value: "Count", angle: -90, position: "insideLeft" }}
