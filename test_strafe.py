@@ -11,10 +11,10 @@ import keyboard
 # TEST CONFIGURATION
 
 LOOPS = 100  # Number of strafe pairs to simulate
-LATE_RANGE_MS = (0, 100)  # Range for late strafes (gap after release) in milliseconds
-EARLY_RANGE_MS = (0, 100)  # Range for early strafes (overlap before release) in milliseconds
-KEY_HOLD_TIME_MS = 200  # Time to hold each key in milliseconds
-PAIR_GAP_TIME_MS = 400  # Time between strafe pairs in milliseconds
+LATE_RANGE_MS = (0, 80)   # Range for late strafes (gap after release) in milliseconds
+EARLY_RANGE_MS = (0, 80)  # Range for early strafes (overlap before release) in milliseconds
+KEY_HOLD_TIME_MS = 10     # Time to hold each key in milliseconds
+PAIR_GAP_TIME_MS = 90    # Time between strafe pairs in milliseconds
 
 def main():
     print(f"Starting in 3 seconds... (will do {LOOPS} strafes)")
