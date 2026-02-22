@@ -52,8 +52,23 @@ export default function StrafeHistogram({
 
   const getBarColor = (center: number) => {
     if (center === 0) return "#c9b458"; // Golden/yellow for perfect
-    if (center < 0) return "#e74c3c"; // Red for early
-    return "#7ea889"; // Green for late
+    
+    // Calculate intensity based on distance from 0 (1 = close/intense, 0 = far/subtle)
+    const intensity = 1 - Math.min(Math.abs(center) / range, 1);
+    
+    if (center < 0) {
+      // Red gradient for early - intense red near center, subtle at extremes
+      const r = Math.round(180 + (75 * intensity)); // 180 -> 255
+      const g = Math.round(100 - (40 * intensity));  // 100 -> 60
+      const b = Math.round(100 - (40 * intensity));  // 100 -> 60
+      return `rgb(${r}, ${g}, ${b})`;
+    } else {
+      // Green gradient for late - intense green near center, subtle at extremes
+      const r = Math.round(150 - (60 * intensity));  // 150 -> 90
+      const g = Math.round(180 + (55 * intensity));  // 180 -> 235
+      const b = Math.round(150 - (40 * intensity));  // 150 -> 110
+      return `rgb(${r}, ${g}, ${b})`;
+    }
   };
 
   if (timings.length === 0) {
